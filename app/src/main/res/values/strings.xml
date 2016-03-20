@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Speech Recognizer</string>
+    <string name="action_settings">Settings</string>
+    <string name="tap_on_mic">Tap on Mic to start</string>
+</resources>
