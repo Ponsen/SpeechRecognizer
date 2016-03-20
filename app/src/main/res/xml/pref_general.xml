@@ -1,0 +1,38 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="@string/pref_continous_key"
+        android:summary="@string/pref_description__continous"
+        android:title="@string/pref_title_continous"/>
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="@string/pref_switch_sendResult_key"
+        android:summary="@string/pref_description__switch_sendResult"
+        android:title="@string/pref_title_switch_sendResult"/>
+
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="@string/pref_serverurl_key"
+        android:summary="@string/pref_description_serverurl"
+        android:title="@string/pref_serverurl_title"
+        android:inputType="textUri"
+        android:dependency="@string/pref_switch_sendResult_key"/>
+
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="@string/pref_port_key"
+        android:summary="@string/pref_description_port"
+        android:title="@string/pref_port_title"
+        android:inputType="number"
+        android:dependency="@string/pref_switch_sendResult_key"/>
+
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="@string/pref_endpoint_key"
+        android:summary="@string/pref_description_endpoint"
+        android:title="@string/pref_endpoint_title"
+        android:dependency="@string/pref_switch_sendResult_key"/>
+
+</PreferenceScreen>

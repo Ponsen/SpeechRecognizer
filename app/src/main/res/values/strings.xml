@@ -2,4 +2,31 @@
     <string name="app_name">Speech Recognizer</string>
     <string name="action_settings">Settings</string>
     <string name="tap_on_mic">Tap on Mic to start</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+    <string name="pref_continous_key">pref_continous_key</string>
+    <string name="pref_title_continous">Restart Listening after Result</string>
+    <string name="pref_description__continous">Starts the Listening Service after the result was received</string>
+
+    <string name="pref_switch_sendResult_key">pref_switch_sendResult_key</string>
+    <string name="pref_title_switch_sendResult">Enable POSTing</string>
+    <string name="pref_description__switch_sendResult">Posts results to desired Server</string>
+
+    <string name="pref_serverurl_key">pref_serverurl_key</string>
+    <string name="pref_description_serverurl">URL to da Serva (http://XXX.XXX.XXX.XXX)</string>
+    <string name="pref_serverurl_title">Server URL</string>
+
+    <string name="pref_port_key">pref_port_key</string>
+    <string name="pref_description_port">Port</string>
+    <string name="pref_port_title">Server Port</string>
+
+    <string name="pref_endpoint_key">pref_endpoint_key</string>
+    <string name="pref_description_endpoint">Endpoint / Route (http://XXX.XXX.XXX.XXX/enpoint)</string>
+    <string name="pref_endpoint_title">Server Endpoint (Route)</string>
+
 </resources>

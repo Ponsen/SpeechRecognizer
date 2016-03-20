@@ -2,6 +2,7 @@ package de.ponsen.speechrecognizer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -18,10 +19,12 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+
+import de.ponsen.speechrecognizer.RestClient.IRequestCallback;
+import de.ponsen.speechrecognizer.RestClient.RequestHandler;
+import okhttp3.HttpUrl;
 
 public class MainActivity extends AppCompatActivity implements RecognitionListener{
 
@@ -29,10 +32,19 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
     ImageButton startListeningButton;
     Animation breath;
-    TextView error_txt, speech_text;
+    TextView speech_error_txt, speech_text, rest_result_txt;
 
     private SpeechRecognizer speech = null;
     private Intent recognizerIntent;
+
+    //settings
+    boolean settingRestartSTT;
+    boolean settingEnableHTTP;
+    String settingServerURL;
+    int settingServerPort;
+    String settingServerEndpoint;
+
+    private RequestHandler requestHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +53,10 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        error_txt = (TextView) findViewById(R.id.error_txt);
+        speech_error_txt = (TextView) findViewById(R.id.speech_error_txt);
         speech_text = (TextView) findViewById(R.id.txtSpeechInput);
+
+        rest_result_txt = (TextView) findViewById(R.id.rest_result_txt);
 
         speech = SpeechRecognizer.createSpeechRecognizer(this);
         speech.setRecognitionListener(this);
@@ -81,6 +95,26 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     }
 
     @Override
+    protected void onResume() {
+        Log.d(TAG, "onResume");
+        //applying settings here to we get the changes
+        settingRestartSTT = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getResources().getString(R.string.pref_continous_key), false);
+
+        settingEnableHTTP = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getResources().getString(R.string.pref_switch_sendResult_key), false);
+        if(settingEnableHTTP){
+            settingServerURL = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.pref_serverurl_key), "");
+            String port = (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.pref_port_key), "80"));
+            if(port.equals(""))
+                port = "80";
+            settingServerPort = Integer.valueOf(port);
+            settingServerEndpoint = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.pref_endpoint_key), "");
+
+            requestHandler = new RequestHandler(HttpUrl.parse(settingServerURL + ":" + settingServerPort));
+        }
+        super.onResume();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         if (speech != null) {
@@ -110,10 +144,16 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void restartSpeech(){
+        speech.stopListening();
+        speech.startListening(recognizerIntent);
     }
 
     @Override
@@ -144,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     @Override
     public void onError(int error) {
         String errorMessage = getErrorText(error);
-        error_txt.setText(errorMessage);
+        speech_error_txt.setText(errorMessage);
         startListeningButton.clearAnimation();
         startListeningButton.setPressed(false);
     }
@@ -169,7 +209,22 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         speech_text.setText(text_temp);
         startListeningButton.clearAnimation();
         startListeningButton.setPressed(false);
-        error_txt.setText("");
+        speech_error_txt.setText("");
+
+        if(settingEnableHTTP){
+            requestHandler.postSpeechResult(settingServerEndpoint, resultModel, new IRequestCallback() {
+                @Override
+                public void requestCallback(String data) {
+                    Log.i(TAG, data);
+                    rest_result_txt.setText(data);
+                }
+            });
+        }
+
+        //restart after result has been handeled
+        if(settingRestartSTT){
+            restartSpeech();
+        }
     }
 
     @Override
@@ -218,4 +273,6 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         }
         return message;
     }
+
+
 }
