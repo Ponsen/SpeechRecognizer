@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     String settingServerURL;
     int settingServerPort;
     String settingServerEndpoint;
+    int settingWaitInMilis;
 
     private RequestHandler requestHandler;
 
@@ -64,7 +65,10 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         recognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, this.getPackageName());
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
         recognizerIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
+        //recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, settingWaitInMilis);
 
 
         breath = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.breath_anim);
@@ -104,13 +108,21 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         if(settingEnableHTTP){
             settingServerURL = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.pref_serverurl_key), "");
             String port = (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.pref_port_key), "80"));
+            //if user decided to enter empty string...
             if(port.equals(""))
                 port = "80";
             settingServerPort = Integer.valueOf(port);
-            settingServerEndpoint = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.pref_endpoint_key), "");
 
             requestHandler = new RequestHandler(HttpUrl.parse(settingServerURL + ":" + settingServerPort));
+
+            settingServerEndpoint = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.pref_endpoint_key), "");
         }
+
+        String milis = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getString(getResources().getString(R.string.pref_wait_milis_key), "1000");
+        if(milis.equals(""))
+            milis = "1000";
+        settingWaitInMilis = Integer.valueOf(milis);
+
         super.onResume();
     }
 
@@ -194,12 +206,12 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
         Log.d(TAG, "onResults");
         ArrayList<String> textResults = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         float[] confidences = results.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
-        float timestamp = System.currentTimeMillis();
+        Long timestamp = System.currentTimeMillis()/1000;
 
         ResultModel resultModel = new ResultModel();
         resultModel.text = textResults;
         resultModel.confidence = confidences;
-        resultModel.timestamp = timestamp;
+        resultModel.timestamp = timestamp.toString();
 
         Log.i(TAG, new GsonBuilder().create().toJson(resultModel, ResultModel.class));
         String text_temp = "";
@@ -230,6 +242,36 @@ public class MainActivity extends AppCompatActivity implements RecognitionListen
     @Override
     public void onPartialResults(Bundle partialResults) {
         Log.d(TAG, "onPartialResults");
+        /*
+        ArrayList<String> textResults = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+        float[] confidences = partialResults.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
+        Long timestamp = System.currentTimeMillis()/1000;
+
+        ResultModel resultModel = new ResultModel();
+        resultModel.text = textResults;
+        resultModel.confidence = confidences;
+        resultModel.timestamp = timestamp.toString();
+
+        Log.i(TAG, new GsonBuilder().create().toJson(resultModel, ResultModel.class));
+        String text_temp = "";
+        for (String result : textResults)
+            text_temp += result + "\n";
+
+        speech_text.setText(text_temp);
+        startListeningButton.clearAnimation();
+        startListeningButton.setPressed(false);
+        speech_error_txt.setText("");
+
+        if(settingEnableHTTP){
+            requestHandler.postSpeechResult(settingServerEndpoint, resultModel, new IRequestCallback() {
+                @Override
+                public void requestCallback(String data) {
+                    Log.i(TAG, data);
+                    rest_result_txt.setText(data);
+                }
+            });
+        }
+        */
     }
 
     @Override

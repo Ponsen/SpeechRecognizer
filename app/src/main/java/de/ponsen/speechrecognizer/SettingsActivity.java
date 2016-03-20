@@ -177,6 +177,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_serverurl_key)));
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_port_key)));
             bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_endpoint_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_wait_milis_key)));
         }
 
         @Override

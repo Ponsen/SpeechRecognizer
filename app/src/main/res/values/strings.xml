@@ -29,4 +29,8 @@
     <string name="pref_description_endpoint">Endpoint / Route (http://XXX.XXX.XXX.XXX/enpoint)</string>
     <string name="pref_endpoint_title">Server Endpoint (Route)</string>
 
+    <string name="pref_wait_milis_key">pref_wait_milis_key</string>
+    <string name="pref_description_wait_milis">Wait Time im Milis</string>
+    <string name="pref_wait_milis_title">The Recognizer waits a certain time, after done speaking</string>
+
 </resources>

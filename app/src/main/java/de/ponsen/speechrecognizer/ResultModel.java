@@ -8,5 +8,5 @@ import java.util.ArrayList;
 public class ResultModel {
     ArrayList<String> text;
     float[] confidence;
-    float timestamp;
+    String timestamp;
 }

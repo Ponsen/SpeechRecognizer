@@ -6,6 +6,13 @@
         android:summary="@string/pref_description__continous"
         android:title="@string/pref_title_continous"/>
 
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="@string/pref_wait_milis_key"
+        android:inputType="number"
+        android:summary="@string/pref_description_wait_milis"
+        android:title="@string/pref_wait_milis_title"/>
+
     <SwitchPreference
         android:defaultValue="false"
         android:key="@string/pref_switch_sendResult_key"
